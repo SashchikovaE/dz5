@@ -1,100 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
-class Grandma
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace tumakov6
 {
-   public string Name { get; set; }
-   public int Age { get; set; }
-   public List<string> Illnesses { get; set; }
-   public List<string> Medicines { get; set; }
-   public Grandma(string name, int age, List<string> illnesses, List<string> medicines)
+    internal class Program
     {
-     Name = name;
-     Age = age;
-     Illnesses = illnesses;
-     Medicines = medicines;
-     }
- }
-        class Hospital
+        static int[,] MultiplyMatrices(int[,] matrix1, int[,] matrix2)
         {
-            public string Name { get; set; }
-            public List<string> TreatableIllnesses { get; set; }
-            public int Capacity { get; set; }
-            public int Occupancy { get; set; }
+            int rows1 = matrix1.GetLength(0);
+            int cols1 = matrix1.GetLength(1);
+            int rows2 = matrix2.GetLength(0);
+            int cols2 = matrix2.GetLength(1);
 
-            public Hospital(string name, List<string> treatableIllnesses, int capacity)
+            if (cols1 != rows2)
             {
-                Name = name;
-                TreatableIllnesses = treatableIllnesses;
-                Capacity = capacity;
-                Occupancy = 0;
+                throw new Exception("невозможно выполнить умножение матриц с данными размерностями");
             }
-        }
+            int[,] result = new int[rows1, cols2];
 
-        class Program
-        {
-            static void Main(string[] args)
+            for (int i = 0; i < rows1; i++)
             {
-                List<Grandma> grandmas = new List<Grandma>();
-                grandmas.Add(new Grandma("grandma 1", 70, new List<string> { "кашель", "лихорадка" }, new List<string> { "сироп от кашля", "парацетомол" }));
-                grandmas.Add(new Grandma("grandma 2", 75, new List<string> { "головная боль", "зубная боль" }, new List<string> { "аспирин", "пепто-бисмол" }));
-                grandmas.Add(new Grandma("grandma 3", 80, new List<string> { }, new List<string> { }));
-
-                Stack<Hospital> hospitals = new Stack<Hospital>();
-                hospitals.Push(new Hospital("hospital 1", new List<string> { "кашель", "лихорадка" }, 2));
-                hospitals.Push(new Hospital("hospital 2", new List<string> { "головная боль", "зубная боль" }, 2));
-
-                foreach (Grandma grandma in grandmas)
+                for (int j = 0; j < cols2; j++)
                 {
-                    if (grandma.Illnesses.Count == 0)
+                    for (int k = 0; k < cols1; k++)
                     {
-                        Hospital firstAvailableHospital = hospitals.Peek();
-
-                        if (firstAvailableHospital != null)
-                        {
-                            firstAvailableHospital.Occupancy++;
-                            Console.WriteLine(grandma.Name + " is admitted to " + firstAvailableHospital.Name);
-                        }
-                    }
-                    else
-                    {
-                        bool admittedToHospital = false;
-
-                        foreach (Hospital hospital in hospitals)
-                        {
-                            int compatibleIllnessesCount = 0;
-
-                            foreach (string illness in grandma.Illnesses)
-                            {
-                                if (hospital.TreatableIllnesses.Contains(illness))
-                                {
-                                    compatibleIllnessesCount++;
-                                }
-                            }
-
-                            if ((double)compatibleIllnessesCount / grandma.Illnesses.Count > 0.5 && hospital.Occupancy < hospital.Capacity)
-                            {
-                                hospital.Occupancy++;
-                                Console.WriteLine(grandma.Name + " is admitted to " + hospital.Name);
-                                admittedToHospital = true;
-                                break;
-                            }
-                        }
-                        if (!admittedToHospital)
-                        {
-                            Console.WriteLine(grandma.Name + "остаётся на улице и плачет");
-                        }
+                        result[i, j] += matrix1[i, k] * matrix2[k, j];
                     }
                 }
-                Console.WriteLine("List of Grandmas:");
-                foreach (Grandma grandma in grandmas)
+            }
+            return result;
+        }
+        static void PrintMatrix(int[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
                 {
-                    Console.WriteLine("имя: " + grandma.Name + ", возраст: " + grandma.Age + ", болезнь: " + string.Join(", ", grandma.Illnesses) + ", медикаменты: " + string.Join(", ", grandma.Medicines));
+                    Console.Write(matrix[i, j] + " ");
                 }
-                Console.WriteLine("List of Hospitals:");
-                foreach (Hospital hospital in hospitals)
-                {
-                    Console.WriteLine("имя: " + hospital.Name + ", излечимые болезни: " + string.Join(", ", hospital.TreatableIllnesses) + ", вместимость: " + hospital.Capacity + ", заполненность: " + hospital.Occupancy + ", процент заполненности: " + (double)hospital.Occupancy / hospital.Capacity * 100 + " %");
-                }
-        Console.ReadKey();
+                Console.WriteLine();
             }
         }
+        static void Main(string[] args)
+        {
+            Console.WriteLine("упражнение 2");
+            int[,] matrix1 =
+            {
+            { 1, 2, 3 },
+            { 4, 5, 6 },
+            { 7, 8, 9 }
+            };
+
+            int[,] matrix2 =
+            {
+            { 10, 11 },
+            { 12, 13 },
+            { 14, 15 }
+            };
+            try
+            {
+                int[,] result = MultiplyMatrices(matrix1, matrix2);
+                PrintMatrix(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+            }
+            Console.ReadLine();
+
+            Console.WriteLine("упражнение 3");
+            double[,] temperature = new double[12, 30];
+            Random random = new Random();
+            for (int i = 0; i < 12; i++)
+            {
+                for (int j = 0; j < 30; j++)
+                {
+                    temperature[i, j] = random.Next(-30, 30);
+                }
+            }
+            double[] averageTemperatures = CalculateAverageTemperatures(temperature);
+            Array.Sort(averageTemperatures);
+            Console.WriteLine("отсортированный массив средних температур:");
+            foreach (double Temperature in averageTemperatures)
+            {
+                Console.WriteLine(temperature);
+            }
+            Console.ReadKey();
+        }
+        static double[] CalculateAverageTemperatures(double[,] temperature)
+        {
+            double[] averageTemperatures = new double[12];
+
+            for (int i = 0; i < 12; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < 30; j++)
+                {
+                    sum += temperature[i, j];
+                }
+                averageTemperatures[i] = sum / 30;
+            }
+
+            return averageTemperatures;
+        }
+    }
+}
